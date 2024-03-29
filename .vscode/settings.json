@@ -9,4 +9,6 @@
           "source.fixAll": "explicit"
         }
       },
+      "errorLens.delay": 2000,
+      "errorLens.delayMode": "debounce"
 }
