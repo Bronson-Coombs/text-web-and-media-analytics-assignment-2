@@ -1,5 +1,4 @@
 {
-    "python.analysis.typeCheckingMode": "basic",
     "python.analysis.autoImportCompletions": true,
     "[python]": {
         "editor.defaultFormatter": "charliermarsh.ruff",
@@ -9,6 +8,7 @@
           "source.fixAll": "explicit"
         }
       },
-      "errorLens.delay": 2000,
-      "errorLens.delayMode": "debounce"
+      "ruff.lint.args": ["--config=/workspaces/text-web-and-media-analytics-assignment-2/python/pyproject.toml"]//,
+      //"python.analysis.diagnosticSeverityOverrides": {"reportUndefinedVariable": "none"},
+      //"python.analysis.typeCheckingMode": "strict"
 }

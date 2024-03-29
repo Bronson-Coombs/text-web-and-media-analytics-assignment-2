@@ -13,15 +13,13 @@ regex = "2023.12.25"
 [tool.poetry.dev-dependencies]
 ruff = "0.3.4"
 
-[tool.pyright]
-include = ["src"]
-typeCheckingMode = "standard"
-pythonVersion = "3.12"
-
 [tool.ruff]
 line-length = 120
 indent-width = 4
 extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+ignore = ["F821"]
 
 [build-system]
 requires = ["poetry-core"]
