@@ -1,0 +1,22 @@
+# Specify the Docker Compose file format version
+version: "3.8"
+
+services:
+  # Define a service named "text-web-and-media-analytics-assignment-2"
+  text-web-and-media-analytics-assignment-2:
+    build:
+      # Set the build context to the parent directory of the docker-compose file
+      context: ..
+      # Specify the Dockerfile location relative to the build context
+      dockerfile: .devcontainer/Dockerfile
+    volumes:
+      # Mount the grandparent directory of the docker-compose file to /workspaces in the container
+      # Use 'cached' mode for better performance on Docker for Mac and Windows
+      - ../..:/workspaces:cached
+    command:
+      # Override the default command with `sleep infinity` to keep the container running indefinitely
+      sleep infinity
+    environment:
+      # Set an environment variable for the container
+      # Used here to enable polling for file changes, beneficial in development environments
+      WATCHPACK_POLLING: "true"
