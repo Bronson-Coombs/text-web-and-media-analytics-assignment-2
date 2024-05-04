@@ -8,7 +8,8 @@
           "source.fixAll": "explicit"
         }
       },
-      "ruff.lint.args": ["--config=/workspaces/text-web-and-media-analytics-assignment-2/python/pyproject.toml"]//,
+      "ruff.lint.args": ["--config=/workspaces/text-web-and-media-analytics-assignment-2/python/pyproject.toml"],//,
       //"python.analysis.diagnosticSeverityOverrides": {"reportUndefinedVariable": "none"},
       //"python.analysis.typeCheckingMode": "strict"
+      "terminal.integrated.cwd": "./assignment-2"
 }
