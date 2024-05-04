@@ -12,3 +12,6 @@ COPY python/poetry.lock .
 
 # Disable poetry creating virtual env in image and install dependencies
 RUN poetry config virtualenvs.create false && poetry install --no-interaction
+
+# Set working directory
+WORKDIR /workspaces/text-web-and-media-analytics-assignment-2/assignment-2
