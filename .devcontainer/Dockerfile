@@ -12,5 +12,3 @@ COPY python/poetry.lock .
 
 # Disable poetry creating virtual env in image and install dependencies
 RUN poetry config virtualenvs.create false && poetry install --no-interaction
-
-# Set working directory
