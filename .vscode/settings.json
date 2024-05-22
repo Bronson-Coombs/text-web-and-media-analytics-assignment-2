@@ -1,15 +1,18 @@
 {
-    "python.analysis.autoImportCompletions": true,
-    "[python]": {
-        "editor.defaultFormatter": "charliermarsh.ruff",
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-          "source.organizeImports": "explicit",
-          "source.fixAll": "explicit"
-        }
-      },
-      "ruff.lint.args": ["--config=/workspaces/text-web-and-media-analytics-assignment-2/python/pyproject.toml"],//,
-      //"python.analysis.diagnosticSeverityOverrides": {"reportUndefinedVariable": "none"},
-      //"python.analysis.typeCheckingMode": "strict"
-      "terminal.integrated.cwd": "./assignment-2"
+  "python.analysis.autoImportCompletions": true,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "explicit",
+      "source.fixAll": "explicit"
+    }
+  },
+  "ruff.lint.args": [
+    "--config=/workspaces/text-web-and-media-analytics-assignment-2/python/pyproject.toml"
+  ], //,
+  //"python.analysis.diagnosticSeverityOverrides": {"reportUndefinedVariable": "none"},
+  //"python.analysis.typeCheckingMode": "strict"
+  "terminal.integrated.cwd": "./assignment-2",
+  "workbench.colorTheme": "Darcula"
 }
