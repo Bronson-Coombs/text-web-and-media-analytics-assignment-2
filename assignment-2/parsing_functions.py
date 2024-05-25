@@ -1,4 +1,3 @@
-import csv
 import os
 import pandas as pd
 import regex as re
@@ -10,11 +9,13 @@ from data_structures import bow_document, bow_document_collection
 def parse_stop_words(stop_word_path: str) -> list:
     """Parse defined list of stop words (assumes txt file with words delimited with ',')."""
 
-    # Type check to ensure stop_word_path is a str
+    # Type check(s)
     if not isinstance(stop_word_path, str):
         raise TypeError("stop_word_path: value must be a str.")
     
-    # NOTE: need attribute check the path exists
+    # Check if path exists
+    if not os.path.exists(stop_word_path):
+        raise FileNotFoundError(f"stop_word_path: specified path does not exist, {stop_word_path}")
 
     # Open file in read mode
     with open(stop_word_path, 'r') as file:
@@ -30,7 +31,7 @@ def parse_stop_words(stop_word_path: str) -> list:
 def tokenization(words: str) -> list:
     """Tokenize input text by removing line breaks, numbers, punctuation, normalizing whitespace, stripping leading/trailing spaces, and splitting into lowercased words."""
 
-    # Type check to ensure words is a str
+    # Type check(s)
     if not isinstance(words, str):
         raise TypeError("words: value must be a str.")
 
@@ -52,11 +53,9 @@ def tokenization(words: str) -> list:
 def parse_xml(stop_words: list, xml_path: str) -> bow_document:
     """Parse a single XML file, process text, and return an bow_document object with term frequencies."""
     
-    # Type check to ensure stop_words is a list of str
+    # Type check(s)
     if not isinstance(stop_words, list) or not all(isinstance(word, str) for word in stop_words):
         raise TypeError("stop_words: must be a list of strings.")
-    
-    # Type check to ensure xml_path is a str
     if not isinstance(xml_path, str):
         raise TypeError("xml_path: value must be a str.")
     
@@ -115,15 +114,15 @@ def parse_xml(stop_words: list, xml_path: str) -> bow_document:
 def parse_collection(stop_words: list, input_path: str) -> bow_document_collection:
     """Parse XML documents in a directory, filter stop words, and return a collection of bow_document objects."""
     
-    # Type check to ensure stop_words is a list of str
+    # Type check(s)
     if not isinstance(stop_words, list) or not all(isinstance(word, str) for word in stop_words):
         raise TypeError("stop_words: must be a list of strings.")
-    
-    # Type check to ensure input_path is a str
     if not isinstance(input_path, str):
         raise TypeError("input_path: value must be a str.")
     
-    # NOTE: need to do attribute check to see if input_path exists
+    # Check if path exists
+    if not os.path.exists(input_path):
+        raise FileNotFoundError(f"input_path: specified path does not exist, {input_path}")
 
     collection = bow_document_collection()  # initialise bow_document_collection object (collection of bow_document objects)
     
@@ -143,11 +142,9 @@ def parse_collection(stop_words: list, input_path: str) -> bow_document_collecti
 def parse_query(query: str, stop_words: list) -> dict:
     """Tokenize an input query, remove stop words, and return a dictionary of remaining word frequencies."""
 
-    # Type check to ensure stop_words is a list of str
+    # Type check(s)
     if not isinstance(stop_words, list) or not all(isinstance(word, str) for word in stop_words):
         raise TypeError("stop_words: must be a list of strings.")
-    
-    # Type check to ensure query is a str
     if not isinstance(query, str):
         raise TypeError("query: value must be a string.")
     
@@ -167,8 +164,15 @@ def parse_query(query: str, stop_words: list) -> dict:
     return query_term_frequency  # return the dictionary containing word frequencies
 
 def parse_query_set(query_set: str) -> pd.DataFrame:
-    
-    # Type check to ensure the query_set is a string
+    """
+    Parses a query set from an XML-like file format containing multiple queries.
+
+    Each query is expected to be enclosed in <Query> tags. The function extracts
+    four main components from each query: the number, title, description, and narrative.
+    These components are captured using regular expressions and returned as a pandas DataFrame.
+    """
+
+    # Type check(s)
     if not isinstance(query_set, str):
         raise TypeError("query_set: value must be a string.")
     
@@ -215,7 +219,15 @@ def parse_query_set(query_set: str) -> pd.DataFrame:
     return query_frame
 
 def parse_evaluations(evaluation_path: str) -> dict:
-    # Type check to ensure the evaluation_path is a string
+    """
+    Parses evaluation files located in a specified directory to extract document relevance judgments.
+    
+    Evaluation files should be named in the format "DatasetXXX.txt" where 'XXX' is a numerical identifier.
+    Each line in these files should contain a document identifier followed by its relevance judgment
+    (e.g., 'doc123 1' indicating that document 'doc123' is relevant).
+    """
+    
+    # Type check(s)
     if not isinstance(evaluation_path, str):
         raise TypeError("evaluation_path: value must be a string.")
     

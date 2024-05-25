@@ -1,6 +1,7 @@
 import math
 
 from data_structures import bow_document_collection
+from ir_tools import score_normalisation
 
 def BM25(collection: bow_document_collection, query: dict) -> dict:
     """
@@ -71,16 +72,9 @@ def BM25(collection: bow_document_collection, query: dict) -> dict:
             
             doc_scores[doc_id] += score  # update the document's score with the product of the IDF and TF components
 
-    # Min-Max normalisation
-    min_score = min(doc_scores.values())
-    max_score = max(doc_scores.values())
-    if (max_score - min_score) == 0:  # to avoid division by zero if all scores are the same,
-        return {doc_id: 0 for doc_id in doc_scores}  # return 0 (opted for this rather than 1 becuase if everything is relevant, nothing it)
-    
-    doc_scores = {doc_id: (score - min_score) / (max_score - min_score) for doc_id, score in doc_scores.items()}  # apply normalisation
-
-    # Sort the documents by their score in descending order and return the sorted dictionary
+    # Sort the documents by their score in descending order, normalise, and return
     doc_scores = dict(sorted(doc_scores.items(), key=lambda item: item[1], reverse=True))
+    doc_scores = score_normalisation(doc_scores)
     return doc_scores
 
 def JM_LM(collection: bow_document_collection, query: dict) -> dict:
@@ -88,18 +82,16 @@ def JM_LM(collection: bow_document_collection, query: dict) -> dict:
     Calculate the conditional probability of each document given a query using the Jelinek-Mercer smoothing Language Model.
     """
     
-    # Type check to ensure collection is an bow_document_collection object
+    # Type check(s)
     if not isinstance(collection, bow_document_collection):
         raise TypeError("collection: must be a bow_document_collection object.")
+    if not isinstance(query, dict):
+        raise TypeError("query: must be a dict object.")
     
     # Check if the collection contains any documents
     if len(collection.docs) == 0:
         raise AttributeError("bow_document_collection: object contains no documents (bow_document objects).")
-    
-    # Validate that the query is a dictionary
-    if not isinstance(query, dict):
-        raise TypeError("query: must be a dict object.")
-    
+       
     # Set lambda parameter for Jelinek-Mercer smoothing
     lambda_val = 0.4
     
@@ -134,7 +126,7 @@ def JM_LM(collection: bow_document_collection, query: dict) -> dict:
                 # Use of log adding the score avoids issues with scores that are initiated
                 # with the multiplicative identity (1) but are not multiplied.
 
-    # Sort the documents by their score in descending order and return the sorted dictionary
+    # Sort the documents by their score in descending order and return the sorted dictionary (normalisation not required)
     doc_scores = dict(sorted(doc_scores.items(), key=lambda item: item[1], reverse=True))
     return doc_scores
 

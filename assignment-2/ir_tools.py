@@ -8,12 +8,9 @@ def write_scores_to_file(scores: dict, filename: str):
     Write the scores dictionary to a .dat file.
     """
 
-    if not isinstance(scores, dict):
-        raise TypeError("scores: value must be a dictionary.")
-    
-    if not all((isinstance(doc_id, str)) and (isinstance(score, (int, float))) for doc_id, score in scores.items()):
-        raise ValueError("scores: dictionary must consist of string keys (for documents) and int/float values (for document scores).")
-
+    # Type check(s)
+    if not isinstance(scores, dict) or not all(isinstance(doc_id, str) and isinstance(score, (int, float)) for doc_id, score in scores.items()):
+        raise TypeError("scores: value must be a dict of str keys and int or float values")
     if not isinstance(filename, str):
         raise TypeError("filename: value must be a string.")
     
@@ -41,33 +38,27 @@ def term_specificity(collection: bow_document_collection, query: dict, evaluatio
     of information retrieval tasks.
     """
 
-    # Type check to ensure coll is a bow_document_collection
+    # Type check(s)
     if not isinstance(collection, bow_document_collection):
         raise TypeError("collection: must be a bow_document_collection object.")
-    
-    # If no collection contains no documents, raise attribute error
-    if len(collection.docs) == 0:
-        raise AttributeError("bow_document_collectionection: object contains no documents (Rcv1Doc objects).")
-    
-    # Type check to ensure query is a dict
     if not isinstance(query, dict):
         raise TypeError("query: must be a dict object.")
-    
-    # Type check to ensure theta_1 & theta_2 are floats
     if not isinstance(theta_1, (float, int)):
         raise TypeError("theta_1: must be a float or int value.")
     if not isinstance(theta_2, (float, int)):
         raise TypeError("theta_2: must be a float or int value.")
-    
-    # Boundary check
-    if not theta_2 > theta_1:
-        raise ValueError("theta_2: must be greater than theta_1.")
-    
-    # Type check to ensure evaluations is a dict of dicts
     if not isinstance(evaluations, dict) or \
     not all(isinstance(doc_id, str) and isinstance(relevance, int) and relevance in [0, 1]
                 for doc_id, relevance in evaluations.items()):
         raise TypeError("evaluations: must be a dict with str keys and with values 0 or 1.")
+
+    # If no collection contains no documents, raise attribute error
+    if len(collection.docs) == 0:
+        raise AttributeError("bow_document_collectionection: object contains no documents (Rcv1Doc objects).")
+
+    # Boundary check
+    if not theta_2 > theta_1:
+        raise ValueError("theta_2: must be greater than theta_1.")
     
     # Pulling list of relevant and non-relevant documents for each query
     relevant_docs = {doc_id:relevance for doc_id, relevance in evaluations.items() if relevance == 1}
@@ -108,3 +99,25 @@ def term_specificity(collection: bow_document_collection, query: dict, evaluatio
             weighted_terms[query_term] = query_term_frequency - abs(query_term_frequency * specificity[query_term])
 
     return weighted_terms
+
+def score_normalisation(scores: dict) -> dict:
+    """
+    Normalises the numerical scores for documents using Min-Max scaling.
+    
+    The function takes a dictionary of document scores and scales each score
+    linearly between 0 and 1. If all scores are identical, they are set to 0 to reflect
+    no variation in significance among them.
+    """
+    
+    # Type check(s)
+    if not isinstance(scores, dict) or not all(isinstance(doc_id, str) and isinstance(score, (int, float)) for doc_id, score in scores.items()):
+        raise TypeError("scores: value must be a dict of str keys and int or float values")
+
+    # Min-Max normalisation
+    min_score = min(scores.values())
+    max_score = max(scores.values())
+    if (max_score - min_score) == 0:  # to avoid division by zero if all scores are the same,
+        return {doc_id: 0 for doc_id in scores}  # return 0 (opted for this rather than 1 becuase if everything is relevant, nothing it)
+    
+    # Apply normalisation and return
+    return {doc_id: (score - min_score) / (max_score - min_score) for doc_id, score in scores.items()}

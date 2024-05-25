@@ -14,7 +14,7 @@ class bow_document:
     def add_term(self, term: str):
         """Add a term to the document or update its frequency if it already exists."""
         
-        # Type check to ensure term is a str
+        # Type check(s)
         if not isinstance(term, str):
             raise TypeError("term: value must be a string.")
         
@@ -36,7 +36,7 @@ class bow_document:
         If sorted_by_freq is False or None (default), the terms are returned in arbitrary order.
         """
 
-        # Type check to ensure sorted_by_freq is either None or a boolean
+        # Type check(s)
         if not isinstance(sorted_by_freq, (bool, type(None))):
             raise TypeError("sorted_by_freq: must be a boolean or None.")
 
@@ -51,7 +51,7 @@ class bow_document:
     def get_bag_of_words(self, sorted_by_freq: bool = None) -> str:
         """Return full bag-of-words representation for bow_document object, including; doc_id, term_count, doc_len, and terms."""
         
-        # Type check to ensure sorted_by_freq is either None or a boolean
+        # Type check(s)
         if not isinstance(sorted_by_freq, (bool, type(None))):
             raise TypeError("sorted_by_freq: must be a boolean or None.")
 
@@ -68,8 +68,12 @@ class bow_document:
     @doc_len.setter  # mutator (setter) method for doc_len
     def doc_len(self, value: int):
         """The doc_len property setter method."""
+        
+        # Type check(s)
         if not isinstance(value, int):
             raise TypeError("doc_len: must be an int.")
+        
+        # Logical check on doc_len
         if value < 0:
             raise ValueError("doc_len: must not be negative.")
         
@@ -86,7 +90,7 @@ class bow_document_collection:
     def add_doc(self, doc: bow_document):
         """Add bow_document object to the collection, using doc_id as the key, and update the inverted index."""
 
-        # Type check to ensure doc is a bow_document object
+        # Type check(s)
         if not isinstance(doc, bow_document):
             raise TypeError("doc: must be an instance of bow_document.")
         
