@@ -258,3 +258,31 @@ def parse_evaluations(evaluation_path: str) -> dict:
 
     # return evaluation data
     return evaluations
+
+def parse_ranking_files(directory, model_filter):
+    """
+    Parses ranking files for a specified model from a directory and loads them into a dictionary.
+    """
+    rankings = {}
+    # Filter files to include only those that start with the specified model name
+    for filename in os.listdir(directory):
+        if filename.startswith(model_filter):
+            # Extract model name and query number from the filename
+            parts = filename.replace('Ranking', '').split('_R')
+            model_name = parts[0]
+            query_number = parts[1]
+            
+            # Ensure the filename matches the model filter
+            if model_name != model_filter:
+                continue
+            
+            rankings[query_number] = {}
+            
+            # Open and read the file
+            with open(os.path.join(directory, filename), 'r') as file:
+                for line in file:
+                    if line.strip():
+                        doc_id, score = line.split()
+                        rankings[query_number][doc_id] = float(score)
+                        
+    return rankings
