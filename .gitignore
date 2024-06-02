@@ -1,7 +1,10 @@
-*/Data_collection
-*/EvaluationBenchmark
-*/the50Queries.txt
-*/RankingOutputs
+Data_Collection/
+EvaluationBenchmark/
+RankingOutputs/
+
+the50Queries.txt
+common-english-words.txt
+
 IFN647 Assignment 2 (Marking Guide).pptx
 IFN647 Assignment 2 (Poster Marking Guide).pdf
 IFN647 Assignment 2 (Specification).pdf
