@@ -2,6 +2,8 @@ from data_structures import bow_document_collection
 
 def term_specificity(collection: bow_document_collection, query: dict, evaluations: dict, theta_1: float | int, theta_2: float | int) -> dict:
     """
+    DEPRECATED: Can only use evaluations from Task 5 onwards (cannot incorporate them to train specificity)
+
     Calculates term specificity based on the coverage of terms in relevant and non-relevant documents,
     then adjusts query term weights based on their calculated specificity thresholds.
 
@@ -72,3 +74,86 @@ def term_specificity(collection: bow_document_collection, query: dict, evaluatio
             weighted_terms[query_term] = query_term_frequency - abs(query_term_frequency * specificity[query_term])
 
     return weighted_terms
+
+def calculate_weighted_f1_score(evaluations, model_results, threshold: float, beta: float = 1.0, top_k: int = None) -> float:
+    """
+    DEPRECATED: Not directly required in task, implemented out of interest. However, worth discussing Precision/Recall/F1 in report.
+    
+    Calculate the weighted F1 score across all topics for a given threshold and beta, optionally considering only the top_k results.
+    """
+    total_f1_score = 0
+    count = 0
+
+    for topic, relevancy in evaluations.items():
+        predicted_scores = model_results.get(topic, {})
+
+        # Sort and possibly limit the results to top_k if specified
+        if top_k:
+            top_items = sorted(predicted_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]
+            filtered_scores = dict(top_items)  # Convert sorted list back to dict
+        else:
+            filtered_scores = {doc_id: score for doc_id, score in predicted_scores.items() if score > threshold}
+
+        # Calculate true positives, false positives, and false negatives
+        true_positives = sum(1 for doc_id in filtered_scores.keys() if relevancy.get(doc_id) == 1)
+        false_positives = sum(1 for doc_id in filtered_scores.keys() if relevancy.get(doc_id) == 0)
+        false_negatives = sum(1 for doc_id, is_relevant in relevancy.items() if is_relevant == 1 and doc_id not in filtered_scores)
+
+        # Calculate precision and recall
+        precision = true_positives / (true_positives + false_positives) if true_positives + false_positives > 0 else 0
+        recall = true_positives / (true_positives + false_negatives) if true_positives + false_negatives > 0 else 0
+
+        # Calculate weighted F1 score
+        if (beta**2 * precision + recall) != 0:
+            f1_score = (1 + beta**2) * (precision * recall) / (beta**2 * precision + recall)
+        else:
+            f1_score = 0
+
+        # Add to total F1 score and increment count
+        total_f1_score += f1_score
+        count += 1
+
+    # Calculate average F1 score across all topics
+    average_f1_score = total_f1_score / count if count > 0 else 0
+    return average_f1_score
+
+def f1_grid_search(evaluations, model_results, thresholds, top_ks: list = None):
+    """
+    DEPRECATED: Not directly required in task, implemented out of interest. However, worth discussing Precision/Recall/F1 in report.
+
+    Example:
+    low_threshold = 0.0000001
+    step_size = 0.0001
+    num_steps = 100
+    thresholds = [low_threshold + i * step_size for i in range(num_steps)]
+    top_ks = [10]
+    f1_grid_search(evaluations, JM_LM_results, thresholds)
+    
+    Determine the best combination of threshold(s) and top_k results which yield the best F1 score.
+    """
+
+    best_score = -float('inf')  # Assuming higher score is better; adjust if needed
+    best_params = {}
+
+    # Loop over all combinations of threshold and top_k
+    for threshold in thresholds:
+        if top_ks:
+            for top_k in top_ks:
+                # Calculate average precision for the current combination of threshold and top_k
+                average_f1  = calculate_weighted_f1_score(evaluations, model_results, threshold, top_k)
+                
+                # Check if the current score is better than what we've seen and update best score and parameters
+                if average_f1  > best_score:
+                    best_score = average_f1 
+                    best_params = {'threshold': threshold}
+        
+        else:
+            # Calculate average precision for the current combination of threshold
+            average_f1  = calculate_weighted_f1_score(evaluations, model_results, threshold)
+            
+            # Check if the current score is better than what we've seen and update best score and parameters
+            if average_f1  > best_score:
+                best_score = average_f1
+                best_params = {'threshold': threshold}
+
+    return best_score, best_params

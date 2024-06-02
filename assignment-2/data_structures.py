@@ -29,37 +29,6 @@ class bow_document:
         """Return the document ID."""
         return self.doc_id
     
-    def get_term_list(self, sorted_by_freq: bool = None) -> dict:
-        """
-        Return a list of terms occurring in the document, optionally sorted by their frequency.
-        If sorted_by_freq is True, the terms are returned sorted by their frequency in descending order.
-        If sorted_by_freq is False or None (default), the terms are returned in arbitrary order.
-        """
-
-        # Type check(s)
-        if not isinstance(sorted_by_freq, (bool, type(None))):
-            raise TypeError("sorted_by_freq: must be a boolean or None.")
-
-        if sorted_by_freq:
-            # If sorted_by_freq is True
-            sorted_terms = sorted(self.terms.items(), key=lambda word: word[1], reverse=sorted_by_freq)  # generate a sorted list of terms by frequency
-            return {term: freq for term, freq in sorted_terms}  # return key:value pairs based on sorted terms
-        else:
-            # If sorted_by_freq is False or None, return the terms as is (i.e., unsorted and as they are added in)
-            return self.terms
-        
-    def get_bag_of_words(self, sorted_by_freq: bool = None) -> str:
-        """Return full bag-of-words representation for bow_document object, including; doc_id, term_count, doc_len, and terms."""
-        
-        # Type check(s)
-        if not isinstance(sorted_by_freq, (bool, type(None))):
-            raise TypeError("sorted_by_freq: must be a boolean or None.")
-
-        # Defining formatted string for bag-of-word representation
-        bag_of_words = f"""doc_id='{self.doc_id}',term_count={len(self.get_term_list())},doc_len={self.doc_len},terms={self.get_term_list(sorted_by_freq)}"""
-
-        return bag_of_words  # return BOW representation; this kind of data can be stored and "unpacked" easily
-    
     @property  # accessor (get) method for doc_len
     def doc_len(self) -> int:
         """The doc_len property getter method."""
@@ -108,16 +77,3 @@ class bow_document_collection:
                 self.term_frequency[term] += 1  # add 1 if the term exists in the corpus dictionary
             else:
                 self.term_frequency[term] = 1  # if it does not exist in the corpus dictionary, initialise by setting to 1
-    
-    def get_collection_ids(self) -> str:
-        """Return list of document IDs present in the collection."""
-
-        # Type check to ensure doc_id is a string
-        if not len(self.docs) > 0:
-            raise AttributeError("bow_document_collection object is empty, no IDs to return.")  # Corrected to match the check
-        
-        doc_ids_str = "'" + "', '".join(self.docs.keys()) + "'"  # create a string that lists doc_ids
-
-        collection_ids = f"bow_document_collection(doc_ids: {doc_ids_str})"  # format the return variable
-
-        return collection_ids

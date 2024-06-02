@@ -58,7 +58,7 @@ def BM25(collection: bow_document_collection, query: dict) -> dict:
             document_term_frequency = doc.terms.get(query_term, 0)  # query term frequency within the document (0 if not present)
             
             # Calculate the term frequency normalization for the document term
-            tf_component = ((k_1 + 1) * document_term_frequency) / (K + document_term_frequency)
+            saturation_component = ((k_1 + 1) * document_term_frequency) / (K + document_term_frequency)
             # This component adjusts the score based on the frequency of the term in the document.
             # The normalisation (denominator) prevents over-emphasis on terms that appear too frequently within a single document.
             # `k_1` controls the non-linear term frequency saturation, and `K` adjusts the weight based on document length.
@@ -68,12 +68,12 @@ def BM25(collection: bow_document_collection, query: dict) -> dict:
             # Adjusts the score based on the query term's frequency.
             # Denominator prevents over-emphasis on query terms that appear frequently.
             
-            score = idf_component * tf_component * query_component  # determine the score (can be non-negative, clamping used below to adjust)
+            score = idf_component * saturation_component * query_component  # determine the score
             
             doc_scores[doc_id] += score  # update the document's score with the product of the IDF and TF components
 
     # Normalise, sort, return
-    doc_scores = score_normalisation(doc_scores, mode = 'zscore')
+    doc_scores = score_normalisation(doc_scores)
     doc_scores = dict(sorted(doc_scores.items(), key=lambda item: item[1], reverse=True))
     return doc_scores
 
@@ -254,7 +254,7 @@ def w5(collection: bow_document_collection, evaluations: dict, theta: int | floa
 
     # Count relevant and total occurrences of each term
     for doc_id, doc in collection.docs.items():
-        for term in doc.get_term_list().keys():
+        for term in doc.terms.keys():
             if evaluations[doc_id] == 1:
                 term_relevance_count[term] = term_relevance_count.get(term, 0) + 1  # initialise term with 1 if not present, otherwise add 1
             term_total_count[term] = term_total_count.get(term, 0) + 1  # initialise term with 1 if not present, otherwise add 1
@@ -306,10 +306,10 @@ def My_PRM(weighting_function, collection: bow_document_collection, query: dict,
 
     # 4) Calculate document scores based on the identified features
     for doc_ID, doc in collection.docs.items():
-        for term, frequency in doc.get_term_list().items():
+        for term, frequency in doc.terms.items():
             doc_scores[doc_ID] += frequency * w5_results.get(term, 0)
         
     # Normalise, sort, return
-    doc_scores = score_normalisation(doc_scores, mode = 'zscore')
+    doc_scores = score_normalisation(doc_scores)
     doc_scores = dict(sorted(doc_scores.items(), key=lambda item: item[1], reverse=True))
     return doc_scores
